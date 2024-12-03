@@ -17,7 +17,7 @@ const DisburseRewards = ({ videoId, transactions }: { videoId: string; transacti
 
   return (
     <div className="bg-white rounded-none w-full shadow-md mx-auto border-2 border-black font-vt323">
-      <div className="h-6 bg-[#5DEB5A] w-full flex justify-between px-2">
+      <div className="h-6 bg-[#CC0000] w-full flex justify-between px-2">
         <p className="text-base font-semibold text-white">{videoId}</p>
         {/* <img src="https://utfs.io/f/PKy8oE1GN2J3JMeRo2HVozIYU8DFRWmkp7SC4bh16KiGHZfv" alt="Logo" /> */}
       </div>

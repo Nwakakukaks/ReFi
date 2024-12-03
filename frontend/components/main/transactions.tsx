@@ -59,7 +59,7 @@ const Transactions: React.FC = () => {
       {!loading && dataDisplay.length > 0 && (
         <table className="min-w-full mt-4 border-2 border-gray-700 text-gray-200 overflow-y-auto">
           <thead>
-            <tr className="bg-[#5DEB5A] text-black">
+            <tr className="bg-[#CC0000] text-black">
               <th className="border px-4 py-1">Amount</th>
               <th className="border px-4 py-1">Video ID</th>
               <th className="border px-4 py-1">Timestamp</th>
@@ -70,7 +70,7 @@ const Transactions: React.FC = () => {
           </thead>
           <tbody>
             {dataDisplay.map((transaction) => (
-              <tr key={transaction.transactionHash} className="bg-white text-black hover:bg-[#5DEB5A]">
+              <tr key={transaction.transactionHash} className="bg-white text-black hover:bg-[#CC0000]">
                 <td className="border px-4 py-2 text-sm">{transaction.amount}</td>
                 <td className="border px-4 py-2 text-sm">{transaction.videoId}</td>
                 <td className="border px-4 py-2 text-sm">{new Date(transaction.timestamp).toLocaleString()}</td>

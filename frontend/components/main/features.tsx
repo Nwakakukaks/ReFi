@@ -18,12 +18,12 @@ export const Features = () => {
 
         <div className="grid grid-cols-2 gap-6">
           <p className="text-4xl font-semibold">
-            Explore case studies of how creators have 10X their revenue using NearPay
+            Explore case studies of how creators have 10X their revenue using ReFi
           </p>
 
           <div className="space-y-5">
             <p className="text-xs text-gray-400">
-              Meet Alex, a passionate content creator who struggled to monetize his art. After discovering NearPay, he
+              Meet Alex, a passionate content creator who struggled to monetize his art. After discovering ReFi, he
               implemented its tools to launch exclusive membership tiers. Within months, his monthly revenue skyrocketed
               as fans eagerly subscribed for behind-the-scenes content. By engaging directly with his community through
               personalized tokens, Alex transformed his passion into a thriving business, proving that with the right

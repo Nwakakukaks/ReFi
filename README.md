@@ -1,7 +1,7 @@
-# NearPay 
+# ReFi 
 ## Near Network Superchat for YouTube
 
-NearPay integrates Near Network payments with YouTube live streams, allowing viewers to send ETH directly to creators during live streams and see their superchats appear in real time on the live chat.
+ReFi integrates Near Network payments with YouTube live streams, allowing viewers to send ETH directly to creators during live streams and see their superchats appear in real time on the live chat.
 
 TLDR: A Youtube superchat alternative, where a user can pay via Near network directly to the content creator via a popup from a URL in the chat.
 
@@ -13,25 +13,25 @@ Real-Time Display: The bot posts messages to the live chat, visible to everyone.
 
 - Send ETH directly to creators via Near Network - popup payment window, so no need to leave the stream and miss any of the live content.
 - Display superchats in YouTube live chat in real time
-- Validates authentic NearPay messages and removes fake ones
+- Validates authentic ReFi messages and removes fake ones
 - Flexible Payment Amounts: Viewers can choose how much to donate
 - Creator dashboard to view superchats and payments coming in in real-time or historical data from previous lives
 
-Live demo: [NearPay](https://nearpay.vercel.app)
+Live demo: [ReFi](https://nearpay.vercel.app)
 
 ***For the best experience please use YouTube in Firefox as sometimes the popup doesn't open in other browsers (like Brave).***
 
 ## What it does / how it works
 
-1. Creators generate a unique NearPay link from the creator landing page.
+1. Creators generate a unique ReFi link from the creator landing page.
 2. The link is connected to their Near address and video ID, they can pin it in their livestream for visibility.
 3. Viewers click this link to send ETH directly to the creator's wallet via Near Network.
 4. Viewers can include a message that instantly appears as a special superchat in the YouTube live chat.
-5. The system validates authentic NearPay messages and removes fake ones.
+5. The system validates authentic ReFi messages and removes fake ones.
 
 ## Impact
 
-NearPay addresses key challenges in the creator economy:
+ReFi addresses key challenges in the creator economy:
 
 1. **Reduced Fees**: Enables creators to retain a larger portion of their earnings.
 2. **Global Reach**: Allows international viewers to easily support creators.
@@ -40,7 +40,7 @@ NearPay addresses key challenges in the creator economy:
 
 ## Contribution to Near Ecosystem
 
-NearPay directly contributes to the growth of the Near ecosystem by:
+ReFi directly contributes to the growth of the Near ecosystem by:
 
 1. Increasing Near Network adoption and usage
 2. Demonstrating practical, user-friendly applications of Near network in everyday scenarios
@@ -48,7 +48,7 @@ NearPay directly contributes to the growth of the Near ecosystem by:
 
 ## Getting Started
 
-To use NearPay, creators need:
+To use ReFi, creators need:
 
 - A YouTube account with live streaming enabled
 - A Near Network wallet address
@@ -60,12 +60,12 @@ To use NearPay, creators need:
 
 1. Visit the creator page
 2. Enter your YouTube Live URL and Near address
-3. Generate a unique NearPay link
+3. Generate a unique ReFi link
 4. Pin the generated link in your YouTube live chat
 
 ### For Viewers
 
-1. Click the NearPay link in the live chat
+1. Click the ReFi link in the live chat
 2. Enter your message and the amount of ETH to send
 3. Pay the Near invoice
 4. Your superchat will appear in the YouTube live chat

@@ -1,66 +1,79 @@
-import { connectorsForWallets } from '@rainbow-me/rainbowkit';
 import {
-  walletConnectWallet,
-  metaMaskWallet,
-  rainbowWallet,
-} from '@rainbow-me/rainbowkit/wallets';
-import { http, createConfig } from 'wagmi';
-import { aurora, auroraTestnet } from './config';
+  getDefaultWallets,
+  connectorsForWallets,
+} from "@rainbow-me/rainbowkit";
+import {
+  argentWallet,
+  trustWallet,
+  ledgerWallet,
+} from "@rainbow-me/rainbowkit/wallets";
+import { configureChains, createConfig } from "wagmi";
+import {
+  mainnet,
+  sepolia,
+  gnosis,
+  polygon,
+  celo,
+  bsc,
+  fantom,
+  arbitrum,
+  avalanche,
+  optimism,
+  moonbeam,
+} from "wagmi/chains";
+import { publicProvider } from "wagmi/providers/public";
 
-// Replace this with your actual environment variable import method for Vite
-const VITE_WC_PROJECT_ID = import.meta.env.VITE_WC_PROJECT_ID;
-
-const projectId = VITE_WC_PROJECT_ID;
-
-if (!projectId) {
-  const providerErrMessage =
-    'To connect to all Wallets you need to provide a VITE_WC_PROJECT_ID env variable';
-  throw new Error(providerErrMessage);
-}
-
-// Aurora Pass specific options
-const walletConnectOptions = {
-  projectId,
-  options: {
-    qrModalOptions: {
-      desktopWallets: [],
-      mobileWallets: [],
-    },
-    defaultChain: aurora,
-    includeWalletIds: [
-      '76260019aec5a3c44dd2421bf78e80f71a6c090d932c413a287193ed79450694', // AuroraPass
-    ],
-  },
-};
-
-const connectors = connectorsForWallets(
+export const { chains, publicClient, webSocketPublicClient } = configureChains(
   [
+    mainnet,
+    sepolia,
     {
-      groupName: 'Recommended',
-      wallets: [
-        () => walletConnectWallet(walletConnectOptions),
-      ],
+      ...gnosis,
+      iconUrl:
+        "https://raw.githubusercontent.com/gnosischain/media-kit/main/Logos/Owl_Logo%20-%20Mark.svg",
     },
-    {
-      groupName: 'Other Wallets',
-      wallets: [
-        () => rainbowWallet(walletConnectOptions),
-        () => metaMaskWallet(walletConnectOptions),
-      ],
-    },
+    polygon,
+    optimism,
+    arbitrum,
+    avalanche,
+    bsc,
+    celo,
+    fantom,
+    moonbeam,
   ],
-  {
-    appName: 'NearPay',
-    projectId,
-  }
+  [publicProvider()],
 );
 
-export const wagmiConfig = createConfig({
-  chains: [aurora, auroraTestnet],
-  multiInjectedProviderDiscovery: false,
-  connectors,
-  transports: {
-    [aurora.id]: http(),
-    [auroraTestnet.id]: http(),
+// For details about Wallet Connect Project ID: https://docs.walletconnect.com/cloud/relay#project-id
+const projectId = import.meta.env.VITE_WC_PROJECT_ID || "";
+
+const appName = "ReFi";
+
+const { wallets } = getDefaultWallets({
+  appName,
+  projectId,
+  chains,
+});
+
+export const demoAppInfo = {
+  appName,
+};
+
+const connectors = connectorsForWallets([
+  ...wallets,
+  {
+    groupName: "Other",
+    wallets: [
+      argentWallet({ projectId, chains }),
+      trustWallet({ projectId, chains }),
+      ledgerWallet({ projectId, chains }),
+    ],
   },
+]);
+
+export const wagmiConfig = createConfig({
+  autoConnect: true,
+  connectors,
+  publicClient,
+  webSocketPublicClient,
 });

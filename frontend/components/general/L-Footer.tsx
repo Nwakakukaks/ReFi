@@ -14,9 +14,9 @@ export function LFooter() {
       {isFooterVisible && (
         <div className="flex justify-between items-start my-6 px-20">
           <div>
-            <p className="text-[#5DEB5A] font-semibold text-lg">NearPay</p>
+            <p className="text-[#CC0000] font-semibold text-lg">ReFi</p>
             <p className="text-xs text-gray-500 w-48 lg:w-96">
-              Create unique links to receive ETH tokens from your viewers during live streams.
+              Create unique links to receive tokens from your viewers during live streams.
             </p>
           </div>
           <div className="flex space-x-3 items-center">

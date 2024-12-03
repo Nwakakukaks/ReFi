@@ -25,9 +25,9 @@ export function CustomConnectButton() {
                 return (
                   <Button
                     onClick={openConnectModal}
-                    className="bg-gradient-to-r from-[#24FE41] to-[#fdfc47] hover:from-[#1EAE36] hover:to-[#e6e600] text-black font-semibold py-2 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 text-base min-w-[160px]"
+                    className="bg-gradient-to-r from-[#CC0000] to-[#d03636] hover:from-[#5b0202] hover:to-[#CC0000] text-white font-semibold py-2 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 text-base min-w-[160px]"
                   >
-                    Connect Aurora
+                    Connect Wallet
                   </Button>
                 );
               }
@@ -36,7 +36,7 @@ export function CustomConnectButton() {
                 return (
                   <Button
                     onClick={openChainModal}
-                    className="bg-[#5DEB5A] hover:bg-[#5DEB5A] text-white font-semibold py-2 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 text-base"
+                    className="bg-[#CC0000] hover:bg-[#CC0000] text-white font-semibold py-2 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 text-base"
                   >
                     Wrong Network
                   </Button>
@@ -61,7 +61,7 @@ export function CustomConnectButton() {
 
                   <Button
                     onClick={openAccountModal}
-                    className="bg-gradient-to-r from-[#24FE41] to-[#fdfc47] hover:from-[#1EAE36] hover:to-[#e6e600] text-black font-medium py-2 px-4 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-2"
+                    className="bg-gradient-to-r from-[#CC0000] to-[#d03636] hover:from-[#5b0202] hover:to-[#CC0000] text-white font-medium py-2 px-4 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-2"
                   >
                     <div className="flex items-center gap-2">
                       <span className="text-sm">{account.displayBalance ? `${account.displayBalance}` : ""}</span>

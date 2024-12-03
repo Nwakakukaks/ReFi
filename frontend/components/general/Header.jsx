@@ -12,7 +12,7 @@ export function Header() {
   };
 
   const handleLogin = () => {
-    navigate("/dashboard");
+    navigate("/create-link");
   };
 
   const isPaymentOrClaimOrAccess =
@@ -30,7 +30,7 @@ export function Header() {
           </div>
           <div className="flex items-center justify-between px-4 py-2 max-w-screen-xl mx-auto w-full flex-wrap lg:px-20 mt-1">
             <h3 onClick={handleHome} className="text-xl font-bold cursor-pointer">
-              NearPay
+              ReFi
             </h3>
 
             {location.pathname === "/" && (
@@ -43,7 +43,7 @@ export function Header() {
 
             <div className="flex items-center space-x-4">
               {location.pathname === "/" ? (
-                <Button onClick={handleLogin} className="bg-[#5DEB5A] rounded-full py-3 px-8 hover:bg-[#5DEB5A]">
+                <Button onClick={handleLogin} className="bg-[#CC0000] rounded-full py-3 px-8 hover:bg-[#CC0000]">
                   Login
                 </Button>
               ) : (

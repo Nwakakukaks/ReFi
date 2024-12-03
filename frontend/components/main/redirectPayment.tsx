@@ -52,7 +52,7 @@ const RedirectToPayment: React.FC = () => {
     // Change the domain from atpus.vercel.app to superbased.vercel.app
     const modifiedUrl = url.replace("https://aptopus.vercel.app", "https://superbased.vercel.app");
 
-    const popup = window.open(modifiedUrl, 'NearPay', "width=450,height=600,left=100,top=100,resizable=yes,scrollbars=yes,status=yes");
+    const popup = window.open(modifiedUrl, 'ReFi', "width=450,height=600,left=100,top=100,resizable=yes,scrollbars=yes,status=yes");
 
     if (!popup || popup.closed || typeof popup.closed === "undefined") {
       setError("Popup blocked - clicking 'Open' will redirect in the current tab");
@@ -68,7 +68,7 @@ const RedirectToPayment: React.FC = () => {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4">
-      {error ? <div className="text-[#5DEB5A] mb-4">{error}</div> : null}
+      {error ? <div className="text-[#CC0000] mb-4">{error}</div> : null}
 
       <AlertDialog open={showDialog}>
         <AlertDialogContent>

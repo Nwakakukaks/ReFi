@@ -5,12 +5,28 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { CopyIcon } from "lucide-react";
+import { 
+  useAccount, 
+  useWalletClient, 
+} from 'wagmi';
+import { parseUnits, zeroAddress } from 'viem';
+import { 
+  RequestNetwork, 
+  Types, 
+  Utils 
+} from '@requestnetwork/request-client.js';
+import { Web3SignatureProvider } from '@requestnetwork/web3-signature';
 
 const CreatorLinkGenerator: React.FC = () => {
   const navigate = useNavigate();
   const [videoUrl, setVideoUrl] = useState("");
-  const [aptosAddress, setAptosAddress] = useState("");
+  const [Address, setAddress] = useState("");
   const [generatedUrl, setGeneratedUrl] = useState("");
+  const [requestId, setRequestId] = useState("");
+
+  // Wallet connection
+  const { address, isDisconnected } = useAccount();
+  const { data: walletClient } = useWalletClient();
 
   const handleStreams = () => {
     navigate("/streams");
@@ -35,16 +51,92 @@ const CreatorLinkGenerator: React.FC = () => {
       });
   };
 
+  const createRequestNetwork = async () => {
+    if (!walletClient || !address) {
+      toast({
+        title: 'Error',
+        description: 'Please connect your wallet',
+        variant: 'destructive'
+      });
+      return null;
+    }
+
+    const signatureProvider = new Web3SignatureProvider(walletClient);
+    const requestClient = new RequestNetwork({
+      nodeConnectionConfig: {
+        baseURL: 'https://ipfs.request.network',
+      },
+      signatureProvider,
+    });
+
+    try {
+      const requestCreateParameters: Types.ICreateRequestParameters = {
+        requestInfo: {
+          currency: {
+            type: Types.RequestLogic.CURRENCY.ERC20,
+            value: 'ETH',
+            network: 'sepolia',
+          },
+          expectedAmount: parseUnits('5', 18).toString(), // $5 worth of ETH
+          payee: {
+            type: Types.Identity.TYPE.ETHEREUM_ADDRESS,
+            value: address,
+          },
+          timestamp: Utils.getCurrentTimestampInSecond(),
+        },
+        paymentNetwork: {
+          id: Types.Extension.PAYMENT_NETWORK_ID.ERC20_FEE_PROXY_CONTRACT,
+          parameters: {
+            paymentNetworkName: 'sepolia',
+            paymentAddress: address,
+            feeAddress: zeroAddress,
+            feeAmount: '0',
+          },
+        },
+        contentData: {
+          videoId: extractVideoId(videoUrl),
+          creatorAddress: Address,
+        },
+        signer: {
+          type: Types.Identity.TYPE.ETHEREUM_ADDRESS,
+          value: address,
+        },
+      };
+
+      const request = await requestClient.createRequest(requestCreateParameters);
+      const confirmedRequestData = await request.waitForConfirmation();
+
+      return confirmedRequestData.requestId;
+    } catch (err) {
+      console.error(err);
+      toast({
+        title: 'Error',
+        description: 'Failed to create payment request',
+        variant: 'destructive'
+      });
+      return null;
+    }
+  };
+
   const generateSuperchatUrl = async () => {
     const videoId = extractVideoId(videoUrl);
-    if (videoId && aptosAddress) {
+    if (videoId && Address) {
       try {
+        // First create Request Network request
+        const requestId = await createRequestNetwork();
+        
+        if (!requestId) return;
+
         const response = await fetch("https://aptopus-backend.vercel.app/generate-short-url", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ videoId, address: aptosAddress }),
+          body: JSON.stringify({ 
+            videoId, 
+            address: Address,
+            requestId // Pass request ID along with other parameters
+          }),
         });
         const data = await response.json();
 
@@ -57,6 +149,7 @@ const CreatorLinkGenerator: React.FC = () => {
         } else {
           const superchatUrl = `${window.location.origin}/s/${data.shortCode}`;
           setGeneratedUrl(superchatUrl);
+          setRequestId(requestId);
         }
       } catch (error) {
         toast({
@@ -69,7 +162,7 @@ const CreatorLinkGenerator: React.FC = () => {
       toast({
         variant: "default",
         title: "Enter your Live URL and Address",
-        description: "Please enter your live url and aptos address to proceed",
+        description: "Please enter your live url and address to proceed",
       });
     }
   };
@@ -97,8 +190,14 @@ const CreatorLinkGenerator: React.FC = () => {
   return (
     <div className="flex justify-center items-center mt-10 h-[70vh]">
       <div className="border-2 border-gray-500 flex flex-col justify-center items-center gap-2 rounded-sm px-4 py-12 shadow-lg w-[90%]">
-        <h1 className="text-2xl text-[#5DEB5A]">Generate Your Unique Link</h1>
-        <p>Generate a unique URL and pin it in your live chat</p>
+        {isDisconnected && (
+          <div className="text-red-500 mb-4">
+            Please connect your wallet
+          </div>
+        )}
+
+        <h1 className="text-2xl text-[#CC0000] font-semibold">Generate Your Unique Link</h1>
+        <p className="font-normal text-sm">Generate a unique URL and pin it in your live chat</p>
 
         <div className="flex space-x-4 w-[90%]">
           <Input
@@ -110,16 +209,17 @@ const CreatorLinkGenerator: React.FC = () => {
           />
           <Input
             type="text"
-            placeholder="Enter your Near address"
-            value={aptosAddress}
-            onChange={(e) => setAptosAddress(e.target.value)}
+            placeholder="Enter your wallet address"
+            value={Address}
+            onChange={(e) => setAddress(e.target.value)}
             className="mt-4 p-2 border rounded-sm text-gray-800"
           />
         </div>
 
         <Button
-          className="submit-button mt-4 bg-[#5DEB5A] text-white p-2 rounded hover:bg-[#5DEB5A] w-[90%]"
+          className="submit-button mt-4 bg-[#CC0000] text-white p-2 rounded hover:bg-[#CC0000] w-[90%]"
           onClick={generateSuperchatUrl}
+          disabled={isDisconnected}
         >
           Generate Creator Link
         </Button>
@@ -127,7 +227,7 @@ const CreatorLinkGenerator: React.FC = () => {
           <div className="flex space-x-3 items-center justify-center mt-4 p-4 bg-white rounded-sm shadow text-gray-900 w-[90%]">
             <p className="text-sm text-center">
               Your generated URL:{" "}
-              <a href={generatedUrl} target="_blank" rel="noopener noreferrer" className="text-[#5DEB5A] underline">
+              <a href={generatedUrl} target="_blank" rel="noopener noreferrer" className="text-[#CC0000] underline">
                 {generatedUrl}
               </a>
             </p>
@@ -135,6 +235,12 @@ const CreatorLinkGenerator: React.FC = () => {
             <button onClick={copyLink}>
               <CopyIcon className="w-4 h-4" />
             </button>
+          </div>
+        )}
+
+        {requestId && (
+          <div className="mt-4 text-sm text-gray-600">
+            Request ID: {requestId}
           </div>
         )}
 

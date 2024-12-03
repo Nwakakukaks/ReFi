@@ -17,6 +17,12 @@ const port = process.env.PORT || 3001;
 
 app.use(express.json()); //  parse JSON in request body
 
+const lightsparkClient = new LightsparkClient(
+  new AccountTokenAuthProvider(process.env.LIGHTSPARK_API_TOKEN_ID, process.env.LIGHTSPARK_API_TOKEN_SECRET),
+);
+
+const nodeId = process.env.LIGHTSPARK_NODE_ID;
+
 const youtube = google.youtube("v3");
 const oauth2Client = new google.auth.OAuth2(
   process.env.YOUTUBE_CLIENT_ID,
@@ -40,11 +46,59 @@ app.use(cors());
 //   res.sendFile(path.join(__dirname, "index.html"));
 // });
 
+async function createInvoiceForLightningAddress(lightningAddress, amountSats, memo) {
+  try {
+    const [username, domain] = lightningAddress.split("@");
+    const amountMsats = amountSats * 1000; // Convert sats to msats
+    const metadata = JSON.stringify([
+      ["text/plain", memo],
+      ["text/identifier", lightningAddress],
+    ]);
+
+    console.log(`Creating invoice for ${lightningAddress} with amount ${amountMsats} msats and memo: ${memo}`);
+    const invoice = await lightsparkClient.createLnurlInvoice(
+      nodeId,
+      amountMsats,
+      metadata,
+      undefined, // expirySecs
+      lightningAddress,
+      memo,
+    );
+
+    if (!invoice) {
+      throw new Error("Invoice creation failed.");
+    }
+
+    console.log("Invoice created successfully");
+    return invoice.data.encodedPaymentRequest;
+  } catch (error) {
+    console.error("Error creating invoice:", error);
+    throw error;
+  }
+}
+
+app.get("/check-invoice/:invoice", async (req, res) => {
+  try {
+    const invoice = req.params.invoice;
+    const decodedInvoice = await lightsparkClient.decodeInvoice(invoice);
+    const paymentHash = decodedInvoice.paymentHash;
+    const outgoingPayments = await lightsparkClient.outgoingPaymentsForPaymentHash(paymentHash);
+
+    const status =
+      outgoingPayments.length > 0 && outgoingPayments[0].status === "SUCCESS" ? { paid: true } : { paid: false };
+
+    res.json(status);
+  } catch (error) {
+    console.error("Error checking invoice status:", error);
+    res.status(500).json({ error: "Error checking invoice status" });
+  }
+});
+
 app.post("/send-message", async (req, res) => {
   const { message, amount, videoId, address } = req.body;
 
   try {
-    const fullMessage = `⚡⚡ 𝗦𝗨𝗣𝗘𝗥𝗖𝗛𝗔𝗧 [${amount} APTO]: ${message.toUpperCase()}`;
+    const fullMessage = `⚡⚡ 𝗦𝗨𝗣𝗘𝗥𝗖𝗛𝗔𝗧 [${amount} ETH]: ${message.toUpperCase()}`;
     addValidMessage(fullMessage);
 
     res.json({ status: "created" });
@@ -78,9 +132,24 @@ app.post("/simulate-payment", async (req, res) => {
     });
   }
 
+  // Here for simulating the generate and pay request
   try {
+    await lightsparkClient.loadNodeSigningKey(nodeId, {
+      password: process.env.TEST_NODE_PASSWORD,
+    });
+    console.log("Node signing key loaded.");
+
+    // Convert amount to millisatoshis (multiply by 1000) cos lightspark api expects this
+    const amountMsats = Number(amount) * 1000;
+
+    const payment = await lightsparkClient.payInvoice(nodeId, invoice, amountMsats, 60);
+    if (!payment) {
+      throw new Error("Unable to pay invoice.");
+    }
+    console.log("Payment done with ID:", payment.id);
+
     const liveChatId = await getLiveChatId(videoId);
-    const fullMessage = `⚡⚡ 𝗦𝗨𝗣𝗘𝗥𝗖𝗛𝗔𝗧 [${amount} APTO]: ${message.toUpperCase()}`;
+    const fullMessage = `⚡⚡ 𝗦𝗨𝗣𝗘𝗥𝗖𝗛𝗔𝗧 [${amount} ETH]: ${message.toUpperCase()}`;
     await postToYouTubeChat(fullMessage, liveChatId);
     addValidMessage(fullMessage);
 
@@ -176,10 +245,19 @@ app.post("/generate-short-url", async (req, res) => {
   console.log("Received request:", { videoId, address });
 
   try {
-    const liveChatId = await getLiveChatId(videoId);
+     // Check that video is actually live
+     const liveChatId = await getLiveChatId(videoId);
+     console.log('Live chat ID obtained:', liveChatId);
+
 
     const shortCode = generateShortCode();
-    shortUrls[shortCode] = { videoId, address };
+
+    //Add the Invoice ID to short URL
+    const sampleInvoice = await createInvoiceForLightningAddress(lightningAddress, 1000, 'Sample Superchat');
+    console.log('Sample invoice generated:', sampleInvoice);
+
+    //Check here for potential bugs 
+    shortUrls[shortCode] = { videoId, address, sampleInvoice };
 
     monitorLiveChat(videoId).catch((error) => {
       console.error("Failed to start monitoring:", error);
@@ -222,7 +300,6 @@ app.get("/s/:shortCode", async (req, res) => {
   }
 });
 
-
 app.get("/c/:shortCode", async (req, res) => {
   const { shortCode } = req.params;
 
@@ -252,7 +329,6 @@ app.get("/c/:shortCode", async (req, res) => {
     });
   }
 });
-
 
 app.get("/a/:shortCode", async (req, res) => {
   const { shortCode } = req.params;
@@ -327,6 +403,47 @@ app.post("/start-monitoring", (req, res) => {
     res.json({ error: "Invalid video ID" });
   }
 });
+
+//Fetching messages connected to an invoice account Perhaps
+app.post('/fetch-messages', async (req, res) => {
+  try {
+      const { lightningAddress } = req.body;
+      const account = await lightsparkClient.getCurrentAccount();
+      if (!account) {
+          throw new Error("Unable to fetch the account.");
+      }
+
+      const transactionsConnection = await account.getTransactions(
+          lightsparkClient,
+          100, // Number of transactions to fetch
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          BitcoinNetwork.REGTEST,
+      );
+
+      const sentMessages = transactionsConnection.entities.filter(transaction => transaction.typename === "OutgoingPayment");
+
+      // See what the lightspark api returns with this, could be useful
+      // console.log("Transaction Data:", JSON.stringify(sentMessages, null, 2));
+
+      const transactions = sentMessages.map(message => ({
+          id: message.id,
+          amountUSD: message.amount.preferredCurrencyValueApprox, // USD 
+          amountSatoshis: message.amount.originalValue / 1000, // Convert millisatoshis to satoshis
+          currency: message.amount.preferredCurrencyUnit,
+          timestamp: message.createdAt,
+          messageText: message.paymentRequestData?.memo || 'No message', // paymentRequestData is where the message is
+      }));
+
+      res.json({ transactions });
+  } catch (error) {
+      console.error('Error fetching messages:', error);
+      res.status(500).json({ error: error.message });
+  }
+});
+
 
 app
   .listen(port, () => {

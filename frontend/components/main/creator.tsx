@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import { Button } from "../ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
 import { useNavigate } from "react-router-dom";
-import DynamicMint from "./create-token";
 
 const Creator: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(0);
@@ -11,7 +10,7 @@ const Creator: React.FC = () => {
 
   const BeginSetup = () => (
     <div className="text-center p-10">
-      <h2 className="text-2xl font-semibold mb-4">Welcome to NearPay</h2>
+      <h2 className="text-2xl font-semibold mb-4">Welcome to ReFi</h2>
       <p className="text-gray-300 text-sm">Get started in just two quick steps</p>
 
       <div className="grid grid-cols-2 gap-5 mx-48 mt-8">
@@ -60,7 +59,7 @@ const Creator: React.FC = () => {
 
   const steps = [
     { title: "", content: <BeginSetup /> },
-    { title: "Create a membership NFT", content: <DynamicMint /> },
+
   ];
 
   const handleProceed = () => {
@@ -80,7 +79,7 @@ const Creator: React.FC = () => {
         <div className="flex justify-center mt-2">
           <Button
             size={"lg"}
-            className="bg-[#5DEB5A] text-white py-2 px-20 hover:bg-[#5DEB5A] rounded-full"
+            className="bg-[#CC0000] text-white py-2 px-20 hover:bg-[#CC0000] rounded-full"
             onClick={handleProceed}
           >
             {currentStep < steps.length - 1 ? "Proceed" : "Start Live Stream"}

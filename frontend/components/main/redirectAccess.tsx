@@ -49,7 +49,7 @@ const RedirectToAccess: React.FC = () => {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4">
-      {!isLoading && error ? <div className="text-[#5DEB5A] mb-4">{error}</div> : null}
+      {!isLoading && error ? <div className="text-[#CC0000] mb-4">{error}</div> : null}
 
       <p>Redirecting to access page...</p>
     </div>

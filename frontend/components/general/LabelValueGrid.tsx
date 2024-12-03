@@ -29,7 +29,7 @@ export interface DisplayValueProps {
 export function DisplayValue({ value, isCorrect, expected }: DisplayValueProps) {
   return (
     <div className="flex flex-col gap-2">
-      <p className={isCorrect ? "text-green-700 dark:text-green-300" : "text-[#5DEB5A] dark:text-[#5DEB5A]"}>{value}</p>
+      <p className={isCorrect ? "text-green-700 dark:text-green-300" : "text-[#CC0000] dark:text-[#CC0000]"}>{value}</p>
       {!isCorrect && expected ? <p className="text-sm">Expected: {expected}</p> : null}
     </div>
   );

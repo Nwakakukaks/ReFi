@@ -40,7 +40,7 @@ export const HeroSection: React.FC = () => {
   const navigate = useNavigate();
 
   const handleGetStarted = () => {
-    navigate("/dashboard");
+    navigate("/create-link");
   };
 
   const carouselImages = ["/icons/youtube.png", "/icons/twitch.png", "/icons/tiktok.png", "/icons/twitch2.png"];
@@ -50,16 +50,13 @@ export const HeroSection: React.FC = () => {
       <div>
         <p className="md:text-5xl text-3xl text-center max-w-4xl font-semibold">Receive YouTube superchats in</p>
         <div className="flex space-x-3 items-center justify-center mt-2">
-          <img src="/icons/aurora.svg" className="w-14 h-14" />
-          <p className="md:text-5xl text-3xl text-center max-w-4xl font-semibold text-[#5DEB5A]">Aurora <span className="text-white">Tokens </span></p>
+         <EVMChainCarousel/>
         </div>
       </div>
 
-      {/* <p className="md:text-5xl text-3xl text-center max-w-4xl font-semibold">
-        Support your favorite creators with <span className="text-[#5DEB5A]">Near</span> Tokens
-      </p> */}
+     
       <p className="text-gray-400 text-sm font-medium max-w-2xl mx-auto text-center">
-        Create shareable links to receive SUPERCHATS in Near tokens from your viewers during live streams. Coming soon
+        Create shareable links to receive SUPERCHATS in any EVM token (powered by Request) from your viewers during live streams. Coming soon
         on Twitch, TikTok, and Instagram!
       </p>
 
@@ -67,7 +64,7 @@ export const HeroSection: React.FC = () => {
         <Button
           onClick={handleGetStarted}
           size={"lg"}
-          className="bg-[#5DEB5A] rounded-full hover:bg-[#5DEB5A] text-white"
+          className="bg-[#CC0000] rounded-full hover:bg-[#CC0000] text-white"
         >
           Get Started Now
         </Button>
@@ -81,6 +78,50 @@ export const HeroSection: React.FC = () => {
       <div className="w-full mt-10">
         <AutoScrollCarousel images={carouselImages} />
       </div>
+    </div>
+  );
+};
+
+
+
+
+
+
+const EVMChains = [
+  { name: "Avalanche", logo: "/icons/avalanche.svg", color: "#E84142" },
+  { name: "Base", logo: "/icons/base.svg", color: "#0052FF" },
+  { name: "Ethereum", logo: "/icons/ethereum.svg", color: "#627EEA" },
+  { name: "Polygon", logo: "/icons/polygon.svg", color: "#8247E5" },
+  { name: "Arbitrum", logo: "/icons/arbitrum.svg", color: "#2B323C" },
+  { name: "Optimism", logo: "/icons/optimism.svg", color: "#FF0420" }
+];
+
+ const EVMChainCarousel: React.FC = () => {
+  const [currentChainIndex, setCurrentChainIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentChainIndex((prev) => (prev + 1) % EVMChains.length);
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const currentChain = EVMChains[currentChainIndex];
+
+  return (
+    <div className="flex items-center space-x-3 transition-all duration-500 ease-in-out">
+      <img 
+        src={currentChain.logo} 
+        alt={`${currentChain.name} logo`} 
+        className="w-12 h-12 transition-all duration-500"
+      />
+      <span 
+        className="md:text-5xl text-3xl font-bold transition-all duration-500" 
+        style={{ color: currentChain.color }}
+      >
+        {currentChain.name}
+      </span>
     </div>
   );
 };

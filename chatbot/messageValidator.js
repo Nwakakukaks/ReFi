@@ -31,7 +31,7 @@ function isValidMessage(message) {
 }
 
 // function isSuperchatFormat(message) {
-//     const regex = /^⚡+ 𝗦𝗨𝗣𝗘𝗥𝗖𝗛𝗔𝗧 \[\d+ APTO\]: .+/;
+//     const regex = /^⚡+ 𝗦𝗨𝗣𝗘𝗥𝗖𝗛𝗔𝗧 \[\d+ ETH\]: .+/;
 //     return regex.test(message);
 // }
 
@@ -43,7 +43,7 @@ function isSuperchatFormat(message) {
   const exactLightningBolts = "⚡⚡";
 
   // Validate the exact format character by character
-  const regex = new RegExp(`^${exactLightningBolts}\\s${exactBoldText}\\s\\[(\\d+(?:\\.\\d+)?)\\sAPTO\\]:\\s.+$`);
+  const regex = new RegExp(`^${exactLightningBolts}\\s${exactBoldText}\\s\\[(\\d+(?:\\.\\d+)?)\\sETH\\]:\\s.+$`);
 
   // Basic format check
   if (!regex.test(message)) {
@@ -78,10 +78,10 @@ function isSuperchatFormat(message) {
   if (superChat !== exactBoldText) return false;
 
   // Verify amount format
-  if (!amountPart.endsWith(" APTO]")) return false;
+  if (!amountPart.endsWith(" ETH]")) return false;
 
   // Extract and validate amount
-  const amount = amountPart.slice(0, -6); // Remove ' APTO]'
+  const amount = amountPart.slice(0, -6); // Remove ' ETH]'
   if (!/^\d+(?:\.\d+)?$/.test(amount)) return false;
 
   // Verify the amount is a valid number
@@ -98,9 +98,9 @@ function isSuperchatFormat(message) {
   const lightningCount = [...message].filter((char) => char === "⚡").length;
   if (lightningCount !== 2) return false;
 
-  // Check for multiple occurrences of SUPERCHAT/APTO
+  // Check for multiple occurrences of SUPERCHAT/ETH
   if ((message.match(/superchat/gi) || []).length > 1) return false;
-  if ((message.match(/apto/gi) || []).length > 1) return false;
+  if ((message.match(/eth/gi) || []).length > 1) return false;
 
   // Success - message passed all validation checks
   return true;
