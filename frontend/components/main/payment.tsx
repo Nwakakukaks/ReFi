@@ -16,19 +16,19 @@ const Payment: React.FC = () => {
   const { chain } = useNetwork();
   const provider = useEthersV5Provider();
   const signer = useEthersV5Signer();
-  const [storageChain, setStorageChain] = useState(() => {
+  const [storageChain] = useState(() => {
     const chains = Array.from(storageChains.keys());
     return chains.length > 0 ? chains[0] : "";
   });
 
-  const [currency, setCurrency] = useState(() => {
+  const [currency] = useState(() => {
     const currencyKeys = Array.from(currencies.keys());
     return currencyKeys.length > 0 ? currencyKeys[0] : "";
   });
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
-  const [generatedUrl, setGeneratedUrl] = useState("");
+  
 
   // Request Network specific states
   const [requestData, setRequestData] = useState<Types.IRequestDataWithEvents>();
@@ -156,38 +156,7 @@ const Payment: React.FC = () => {
     }
   };
 
-  const generateClaimUrl = async () => {
-    if (videoId && recipientAddress) {
-      try {
-        const response = await fetch("https://aptopus-backend.vercel.app/generate-short-url", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ videoId, address: recipientAddress }),
-        });
-        const data = await response.json();
 
-        if (data.error) {
-          toast({
-            variant: "destructive",
-            title: "Error",
-            description: data.error,
-          });
-        } else {
-          const claimUrl = `${window.location.origin}/c/${data.shortCode}`;
-          setGeneratedUrl(claimUrl);
-        }
-      } catch (error) {
-        console.error("Error generating claim URL:", error);
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: `An error occurred: ${error}`,
-        });
-      }
-    }
-  };
 
   // Load request data on component mount
   useEffect(() => {
