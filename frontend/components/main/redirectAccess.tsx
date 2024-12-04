@@ -38,7 +38,7 @@ const RedirectToAccess: React.FC = () => {
     if (!url) return;
 
     // Modify the URL
-    const modifiedUrl = url.replace("https://aptopus.vercel.app", "https://superbased.vercel.app");
+    const modifiedUrl = url.replace("https://aptopus.vercel.app", "https://refi-request.vercel.app");
 
     window.location.href = modifiedUrl;
   };

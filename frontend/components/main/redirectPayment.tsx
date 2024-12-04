@@ -49,8 +49,8 @@ const RedirectToPayment: React.FC = () => {
     console.log(url);
     if (!url) return;
 
-    // Change the domain from atpus.vercel.app to superbased.vercel.app
-    const modifiedUrl = url.replace("https://aptopus.vercel.app", "https://superbased.vercel.app");
+    // Change the domain from atpus.vercel.app to refi-request.vercel.app
+    const modifiedUrl = url.replace("https://aptopus.vercel.app", "https://refi-request.vercel.app");
 
     const popup = window.open(modifiedUrl, 'ReFi', "width=450,height=600,left=100,top=100,resizable=yes,scrollbars=yes,status=yes");
 
