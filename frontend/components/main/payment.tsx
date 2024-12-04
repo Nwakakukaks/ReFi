@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { toast } from "../ui/use-toast";
-import { useAccount, useNetwork } from "wagmi";
+import { useAccount, useNetwork, useWalletClient } from "wagmi";
 import { RequestNetwork, Types } from "@requestnetwork/request-client.js";
 import { payRequest, hasSufficientFunds, hasErc20Approval, approveErc20 } from "@requestnetwork/payment-processor";
 import { Web3SignatureProvider } from "@requestnetwork/web3-signature";
@@ -12,7 +12,6 @@ import { currencies } from "@/hooks/currency";
 import { storageChains } from "@/hooks/storage-chain";
 
 const Payment: React.FC = () => {
-  const { address } = useAccount();
   const { chain } = useNetwork();
   const provider = useEthersV5Provider();
   const signer = useEthersV5Signer();
@@ -21,6 +20,10 @@ const Payment: React.FC = () => {
     return chains.length > 0 ? chains[0] : "";
   });
 
+   // Wallet connection
+   const { address } = useAccount();
+   const { data: walletClient } = useWalletClient();
+
   const [currency] = useState(() => {
     const currencyKeys = Array.from(currencies.keys());
     return currencyKeys.length > 0 ? currencyKeys[0] : "";
@@ -28,11 +31,13 @@ const Payment: React.FC = () => {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
-  
 
   // Request Network specific states
   const [requestData, setRequestData] = useState<Types.IRequestDataWithEvents>();
-  const [requestId] = useState(new URLSearchParams(window.location.search).get("requestId") || "");
+  const [requestId] = useState(
+    new URLSearchParams(window.location.search).get("requestId") ||
+      "01823083f04272eac839768a9371740488784da3826c161f104c19f9e1efd94179",
+  );
   const [recipientAddress] = useState(new URLSearchParams(window.location.search).get("lnaddr") || "");
   const [videoId] = useState(new URLSearchParams(window.location.search).get("vid") || "");
 
@@ -60,20 +65,17 @@ const Payment: React.FC = () => {
     try {
       setLoading(true);
 
-      // Initialize Request Network client
-      const signatureProvider = new Web3SignatureProvider(signer);
+      const signatureProvider = new Web3SignatureProvider(walletClient);
       const requestClient = new RequestNetwork({
         nodeConnectionConfig: {
-          baseURL: storageChains.get(storageChain)!.gateway,
+          baseURL: selectedStorageChain.gateway,
         },
         signatureProvider,
       });
 
-      // Fetch the request
       const request = await requestClient.fromRequestId(requestId);
       const requestData = request.getData();
 
-      // Check if the request is on the correct network
       if (requestData.currencyInfo.network !== chain?.network) {
         toast({
           title: "Network Mismatch",
@@ -111,7 +113,7 @@ const Payment: React.FC = () => {
       const paymentTx = await payRequest(requestData, signer);
       await paymentTx.wait(2);
 
-      // Backend simulation (similar to previous implementation)
+     
       const backendResponse = await fetch("https://aptopus-backend.vercel.app/simulate-payment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -156,19 +158,15 @@ const Payment: React.FC = () => {
     }
   };
 
-
-
   // Load request data on component mount
   useEffect(() => {
     const loadRequestData = async () => {
       if (requestId) {
         try {
-          const signatureProvider = new Web3SignatureProvider(signer);
           const requestClient = new RequestNetwork({
             nodeConnectionConfig: {
               baseURL: storageChains.get(storageChain)!.gateway,
             },
-            signatureProvider,
           });
 
           const request = await requestClient.fromRequestId(requestId);
@@ -184,10 +182,8 @@ const Payment: React.FC = () => {
       }
     };
 
-    if (signer) {
-      loadRequestData();
-    }
-  }, [requestId, signer]);
+    loadRequestData();
+  }, [requestId]);
 
   return (
     <div className="flex flex-col gap-3 justify-center items-center mx-auto h-[75vh]">
@@ -208,8 +204,7 @@ const Payment: React.FC = () => {
           {requestData && (
             <div className="mb-4 text-gray-700">
               <p>
-                Request Amount: {Number(requestData.expectedAmount) / Math.pow(10, 18)}{" "}
-                {requestData.currency}
+                Request Amount: {Number(requestData.expectedAmount) / Math.pow(10, 18)} {requestData.currency}
               </p>
             </div>
           )}
