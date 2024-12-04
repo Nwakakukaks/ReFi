@@ -8,13 +8,23 @@ import { payRequest, hasSufficientFunds, hasErc20Approval, approveErc20 } from "
 import { Web3SignatureProvider } from "@requestnetwork/web3-signature";
 import { useEthersV5Signer } from "@/hooks/use-ethers-signer";
 import { useEthersV5Provider } from "@/hooks/use-ethers-provider";
+import { currencies } from "@/hooks/currency";
+import { storageChains } from "@/hooks/storage-chain";
 
 const Payment: React.FC = () => {
   const { address } = useAccount();
   const { chain } = useNetwork();
   const provider = useEthersV5Provider();
   const signer = useEthersV5Signer();
+  const [storageChain, setStorageChain] = useState(() => {
+    const chains = Array.from(storageChains.keys());
+    return chains.length > 0 ? chains[0] : "";
+  });
 
+  const [currency, setCurrency] = useState(() => {
+    const currencyKeys = Array.from(currencies.keys());
+    return currencyKeys.length > 0 ? currencyKeys[0] : "";
+  });
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
@@ -35,6 +45,18 @@ const Payment: React.FC = () => {
       return;
     }
 
+    const selectedCurrency = currencies.get(currency);
+    const selectedStorageChain = storageChains.get(storageChain);
+
+    if (!selectedCurrency || !selectedStorageChain) {
+      toast({
+        title: "Configuration Error",
+        description: "Invalid currency or storage chain configuration",
+        variant: "destructive",
+      });
+      return null;
+    }
+
     try {
       setLoading(true);
 
@@ -42,7 +64,7 @@ const Payment: React.FC = () => {
       const signatureProvider = new Web3SignatureProvider(signer);
       const requestClient = new RequestNetwork({
         nodeConnectionConfig: {
-          baseURL: "https://sepolia.gateway.request.network/",
+          baseURL: storageChains.get(storageChain)!.gateway,
         },
         signatureProvider,
       });
@@ -62,7 +84,6 @@ const Payment: React.FC = () => {
       }
 
       // Check for sufficient funds
-
       const hasFunds = await hasSufficientFunds({
         request: requestData,
         address: address as string,
@@ -114,7 +135,7 @@ const Payment: React.FC = () => {
         // Generate claim URL (reusing existing logic)
         // await generateClaimUrl();
 
-        setSuccessMessage(`Your Superchat has been posted ⚡⚡`);
+        setSuccessMessage(`Your Superchat has been posted ⚡⚡ successfully`);
       } else {
         toast({
           title: "Error",
@@ -176,7 +197,7 @@ const Payment: React.FC = () => {
           const signatureProvider = new Web3SignatureProvider(signer);
           const requestClient = new RequestNetwork({
             nodeConnectionConfig: {
-              baseURL: "https://sepolia.gateway.request.network/",
+              baseURL: storageChains.get(storageChain)!.gateway,
             },
             signatureProvider,
           });
@@ -227,7 +248,7 @@ const Payment: React.FC = () => {
             id="send-superchat-button"
             onClick={payTheRequest}
             disabled={loading || !requestId}
-            className={`w-full bg-gradient-to-br from-[#5DEB5A] to-[#5DEB5A] text-white rounded p-2 transition-all duration-300 ${
+            className={`w-full bg-gradient-to-br from-[#CC0000] to-[#880606] text-white rounded p-2 transition-all duration-300 ${
               loading ? "opacity-70 cursor-not-allowed" : ""
             }`}
           >
@@ -240,12 +261,12 @@ const Payment: React.FC = () => {
         <div className="bg-white text-gray-900 rounded-md p-2 mt-1 w-[90%]">
           <h2 className="text-base font-semibold">Payment Successful!</h2>
           <p className="text-sm">{successMessage}</p>
-          <p className="text-xs mt-2">
+          {/* <p className="text-xs mt-2">
             Hurray! claim your token here:{" "}
             <a href={generatedUrl} className="text-[#5DEB5A]">
               {generatedUrl}
             </a>
-          </p>
+          </p> */}
         </div>
       )}
     </div>

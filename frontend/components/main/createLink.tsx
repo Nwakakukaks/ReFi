@@ -5,28 +5,35 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { CopyIcon } from "lucide-react";
-import { 
-  useAccount, 
-  useWalletClient, 
-} from 'wagmi';
-import { parseUnits, zeroAddress } from 'viem';
-import { 
-  RequestNetwork, 
-  Types, 
-  Utils 
-} from '@requestnetwork/request-client.js';
-import { Web3SignatureProvider } from '@requestnetwork/web3-signature';
+import { useAccount, useWalletClient } from "wagmi";
+import { parseUnits, zeroAddress } from "viem";
+import { RequestNetwork, Types, Utils } from "@requestnetwork/request-client.js";
+import { Web3SignatureProvider } from "@requestnetwork/web3-signature";
+import { currencies } from "@/hooks/currency";
+import { storageChains } from "@/hooks/storage-chain";
 
 const CreatorLinkGenerator: React.FC = () => {
   const navigate = useNavigate();
   const [videoUrl, setVideoUrl] = useState("");
   const [Address, setAddress] = useState("");
   const [generatedUrl, setGeneratedUrl] = useState("");
-  const [requestId, setRequestId] = useState("");
+
+  const [storageChain, setStorageChain] = useState(() => {
+    const chains = Array.from(storageChains.keys());
+    return chains.length > 0 ? chains[0] : "";
+  });
+
+  const [currency, setCurrency] = useState(() => {
+    const currencyKeys = Array.from(currencies.keys());
+    return currencyKeys.length > 0 ? currencyKeys[0] : "";
+  });
 
   // Wallet connection
   const { address, isDisconnected } = useAccount();
   const { data: walletClient } = useWalletClient();
+
+  // Validation checks
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
   const handleStreams = () => {
     navigate("/streams");
@@ -37,6 +44,15 @@ const CreatorLinkGenerator: React.FC = () => {
   };
 
   const copyLink = () => {
+    if (!generatedUrl) {
+      toast({
+        variant: "destructive",
+        title: "No Link to Copy",
+        description: "Please generate a link first.",
+      });
+      return;
+    }
+
     navigator.clipboard
       .writeText(generatedUrl)
       .then(() => {
@@ -48,36 +64,102 @@ const CreatorLinkGenerator: React.FC = () => {
       })
       .catch((error) => {
         console.error("Error copying the link: ", error);
+        toast({
+          variant: "destructive",
+          title: "Copy Failed",
+          description: "Unable to copy the link.",
+        });
       });
   };
 
+  // Enhanced validation
+  const validateInputs = () => {
+    const errors: string[] = [];
+
+    // Validate video URL
+    if (!videoUrl) {
+      errors.push("YouTube Live URL is required");
+    } else {
+      const videoId = extractVideoId(videoUrl);
+      if (!videoId) {
+        errors.push("Invalid YouTube URL. Please provide a valid live stream or video URL.");
+      }
+    }
+
+    // Validate address
+    if (!Address || !isValidEthereumAddress(Address)) {
+      errors.push("Invalid Ethereum address");
+    }
+
+    // Validate currency and storage chain
+    if (!currency || !currencies.has(currency)) {
+      errors.push("Invalid currency selected");
+    }
+
+    if (!storageChain || !storageChains.has(storageChain)) {
+      errors.push("Invalid storage chain selected");
+    }
+
+    setValidationErrors(errors);
+    return errors.length === 0;
+  };
+
+  // Ethereum address validation
+  const isValidEthereumAddress = (address: string): boolean => {
+    const ethereumAddressRegex = /^0x[a-fA-F0-9]{40}$/;
+    return ethereumAddressRegex.test(address);
+  };
+
   const createRequestNetwork = async () => {
-    if (!walletClient || !address) {
+    // Validate inputs before proceeding
+    if (!validateInputs()) {
       toast({
-        title: 'Error',
-        description: 'Please connect your wallet',
-        variant: 'destructive'
+        title: "Validation Error",
+        description: validationErrors.join(", "),
+        variant: "destructive",
       });
       return null;
     }
 
-    const signatureProvider = new Web3SignatureProvider(walletClient);
-    const requestClient = new RequestNetwork({
-      nodeConnectionConfig: {
-        baseURL: 'https://ipfs.request.network',
-      },
-      signatureProvider,
-    });
+    if (!walletClient || !address) {
+      toast({
+        title: "Wallet Error",
+        description: "Please connect your wallet",
+        variant: "destructive",
+      });
+      return null;
+    }
+
+    // Verify currency and storage chain are valid
+    const selectedCurrency = currencies.get(currency);
+    const selectedStorageChain = storageChains.get(storageChain);
+
+    if (!selectedCurrency || !selectedStorageChain) {
+      toast({
+        title: "Configuration Error",
+        description: "Invalid currency or storage chain configuration",
+        variant: "destructive",
+      });
+      return null;
+    }
 
     try {
+      const signatureProvider = new Web3SignatureProvider(walletClient);
+      const requestClient = new RequestNetwork({
+        nodeConnectionConfig: {
+          baseURL: selectedStorageChain.gateway,
+        },
+        signatureProvider,
+      });
+
       const requestCreateParameters: Types.ICreateRequestParameters = {
         requestInfo: {
           currency: {
-            type: Types.RequestLogic.CURRENCY.ERC20,
-            value: 'ETH',
-            network: 'sepolia',
+            type: selectedCurrency.type,
+            value: selectedCurrency.value,
+            network: selectedCurrency.network,
           },
-          expectedAmount: parseUnits('5', 18).toString(), // $5 worth of ETH
+          expectedAmount: parseUnits("1", selectedCurrency.decimals).toString(), // $1 worth
           payee: {
             type: Types.Identity.TYPE.ETHEREUM_ADDRESS,
             value: address,
@@ -87,10 +169,10 @@ const CreatorLinkGenerator: React.FC = () => {
         paymentNetwork: {
           id: Types.Extension.PAYMENT_NETWORK_ID.ERC20_FEE_PROXY_CONTRACT,
           parameters: {
-            paymentNetworkName: 'sepolia',
+            paymentNetworkName: selectedCurrency.network,
             paymentAddress: address,
             feeAddress: zeroAddress,
-            feeAmount: '0',
+            feeAmount: "0",
           },
         },
         contentData: {
@@ -99,7 +181,7 @@ const CreatorLinkGenerator: React.FC = () => {
         },
         signer: {
           type: Types.Identity.TYPE.ETHEREUM_ADDRESS,
-          value: address,
+          value: address as string,
         },
       };
 
@@ -108,61 +190,73 @@ const CreatorLinkGenerator: React.FC = () => {
 
       return confirmedRequestData.requestId;
     } catch (err) {
-      console.error(err);
+      console.error("Error in createRequestNetwork:", err);
+
+      // More detailed error handling
+      const errorMessage = err instanceof Error ? err.message : "An unknown error occurred while creating the request";
+
       toast({
-        title: 'Error',
-        description: 'Failed to create payment request',
-        variant: 'destructive'
+        title: "Request Creation Error",
+        description: errorMessage,
+        variant: "destructive",
       });
       return null;
     }
   };
 
   const generateSuperchatUrl = async () => {
-    const videoId = extractVideoId(videoUrl);
-    if (videoId && Address) {
-      try {
-        // First create Request Network request
-        const requestId = await createRequestNetwork();
-        
-        if (!requestId) return;
+    if (!validateInputs()) {
+      return;
+    }
 
-        const response = await fetch("https://aptopus-backend.vercel.app/generate-short-url", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ 
-            videoId, 
-            address: Address,
-            requestId // Pass request ID along with other parameters
-          }),
-        });
-        const data = await response.json();
+    try {
+      const requestId = await createRequestNetwork();
 
-        if (data.error) {
-          toast({
-            variant: "destructive",
-            title: "Error",
-            description: data.error,
-          });
-        } else {
-          const superchatUrl = `${window.location.origin}/s/${data.shortCode}`;
-          setGeneratedUrl(superchatUrl);
-          setRequestId(requestId);
-        }
-      } catch (error) {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: `An error occurred: ${error}`,
-        });
+      if (!requestId) {
+        console.log("No requestId returned. Exiting...");
+        return;
       }
-    } else {
+
+      console.log(`Request Network request created with requestId: ${requestId}`);
+
+      const videoId = extractVideoId(videoUrl);
+
+      console.log("Making API call to generate short URL...");
+      const response = await fetch("https://aptopus-backend.vercel.app/generate-short-url", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          videoId,
+          address: Address,
+          requestId,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to generate short URL");
+      }
+
+      const superchatUrl = `${window.location.origin}/s/${data.shortCode}`;
+      setGeneratedUrl(superchatUrl);
+
       toast({
         variant: "default",
-        title: "Enter your Live URL and Address",
-        description: "Please enter your live url and address to proceed",
+        title: "Link Generated",
+        description: "Your creator link has been successfully generated!",
+      });
+    } catch (error) {
+      console.error("An error occurred:", error);
+
+      const errorMessage = error instanceof Error ? error.message : "An unexpected error occurred";
+
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: errorMessage,
       });
     }
   };
@@ -181,6 +275,8 @@ const CreatorLinkGenerator: React.FC = () => {
           return parsedUrl.pathname.slice(1);
         }
       }
+
+      console.warn("Unable to extract video ID from URL:", url);
     } catch (error) {
       console.error("Error parsing URL:", error);
     }
@@ -190,11 +286,7 @@ const CreatorLinkGenerator: React.FC = () => {
   return (
     <div className="flex justify-center items-center mt-10 h-[70vh]">
       <div className="border-2 border-gray-500 flex flex-col justify-center items-center gap-2 rounded-sm px-4 py-12 shadow-lg w-[90%]">
-        {isDisconnected && (
-          <div className="text-red-500 mb-4">
-            Please connect your wallet
-          </div>
-        )}
+        {isDisconnected && <div className="text-red-500 mb-4">Please connect your wallet</div>}
 
         <h1 className="text-2xl text-[#CC0000] font-semibold">Generate Your Unique Link</h1>
         <p className="font-normal text-sm">Generate a unique URL and pin it in your live chat</p>
@@ -216,6 +308,34 @@ const CreatorLinkGenerator: React.FC = () => {
           />
         </div>
 
+        <div className="flex space-x-4 w-[90%]">
+          <select
+            name="currency"
+            onChange={(e) => setCurrency(e.target.value)}
+            defaultValue={currency}
+            className="mt-4 p-2 border rounded-sm text-gray-800"
+          >
+            {Array.from(currencies.entries()).map(([key, value]) => (
+              <option key={key} value={key}>
+                {value.symbol} ({value.network})
+              </option>
+            ))}
+          </select>
+
+          <select
+            name="storage-chain"
+            onChange={(e) => setStorageChain(e.target.value)}
+            defaultValue={storageChain}
+            className="mt-4 p-2 border rounded-sm text-gray-800"
+          >
+            {Array.from(storageChains.entries()).map(([key, value]) => (
+              <option key={key} value={key}>
+                {value.name} ({value.type})
+              </option>
+            ))}
+          </select>
+        </div>
+
         <Button
           className="submit-button mt-4 bg-[#CC0000] text-white p-2 rounded hover:bg-[#CC0000] w-[90%]"
           onClick={generateSuperchatUrl}
@@ -235,12 +355,6 @@ const CreatorLinkGenerator: React.FC = () => {
             <button onClick={copyLink}>
               <CopyIcon className="w-4 h-4" />
             </button>
-          </div>
-        )}
-
-        {requestId && (
-          <div className="mt-4 text-sm text-gray-600">
-            Request ID: {requestId}
           </div>
         )}
 
