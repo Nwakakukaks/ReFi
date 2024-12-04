@@ -17,7 +17,7 @@ const CreatorLinkGenerator: React.FC = () => {
   const [videoUrl, setVideoUrl] = useState("");
   const [Address, setAddress] = useState("");
   const [generatedUrl, setGeneratedUrl] = useState("");
-
+  const [amount, setAmount] = useState("");
   const [storageChain, setStorageChain] = useState(() => {
     const chains = Array.from(storageChains.keys());
     return chains.length > 0 ? chains[0] : "";
@@ -159,7 +159,7 @@ const CreatorLinkGenerator: React.FC = () => {
             value: selectedCurrency.value,
             network: selectedCurrency.network,
           },
-          expectedAmount: parseUnits("1", selectedCurrency.decimals).toString(), // $1 worth
+          expectedAmount: parseUnits(amount, selectedCurrency.decimals).toString(), // $1 worth
           payee: {
             type: Types.Identity.TYPE.ETHEREUM_ADDRESS,
             value: address,
@@ -309,31 +309,40 @@ const CreatorLinkGenerator: React.FC = () => {
         </div>
 
         <div className="flex space-x-4 w-[90%]">
-          <select
-            name="currency"
-            onChange={(e) => setCurrency(e.target.value)}
-            defaultValue={currency}
+          <Input
+            type="text"
+            placeholder="Set your superchat amount"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
             className="mt-4 p-2 border rounded-sm text-gray-800"
-          >
-            {Array.from(currencies.entries()).map(([key, value]) => (
-              <option key={key} value={key}>
-                {value.symbol} ({value.network})
-              </option>
-            ))}
-          </select>
+          />
+          <div className="flex space-x-2 ">
+            <select
+              name="currency"
+              onChange={(e) => setCurrency(e.target.value)}
+              defaultValue={currency}
+              className="mt-4 p-2 border rounded-sm text-gray-800"
+            >
+              {Array.from(currencies.entries()).map(([key, value]) => (
+                <option key={key} value={key}>
+                  {value.symbol} ({value.network})
+                </option>
+              ))}
+            </select>
 
-          <select
-            name="storage-chain"
-            onChange={(e) => setStorageChain(e.target.value)}
-            defaultValue={storageChain}
-            className="mt-4 p-2 border rounded-sm text-gray-800"
-          >
-            {Array.from(storageChains.entries()).map(([key, value]) => (
-              <option key={key} value={key}>
-                {value.name} ({value.type})
-              </option>
-            ))}
-          </select>
+            <select
+              name="storage-chain"
+              onChange={(e) => setStorageChain(e.target.value)}
+              defaultValue={storageChain}
+              className="mt-4 p-2 border rounded-sm text-gray-800"
+            >
+              {Array.from(storageChains.entries()).map(([key, value]) => (
+                <option key={key} value={key}>
+                  {value.name} ({value.type})
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
         <Button
