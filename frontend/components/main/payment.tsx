@@ -229,53 +229,80 @@ const Payment: React.FC = () => {
   }, [requestId]);
 
   return (
-    <div className="flex flex-col gap-3 justify-center items-center mx-auto h-[75vh]">
-      {!address ? (
-        <div className=""></div>
-      ) : (
-        <div className={`bg-white rounded-lg shadow-md px-6 py-12 w-[85%]`}>
-          <h1 className="text-2xl text-[#5DEB5A]">ReFi </h1>
-          <Input
-            name="message"
-            placeholder="Enter your Superchat message"
-            type="text"
-            maxLength={220}
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            className="w-full border rounded p-2 mt-2 mb-4 text-gray-800"
-          />
-          {requestData && (
-            <div className="mb-4 text-gray-700">
-              <p>
-                Request Amount: {Number(requestData.expectedAmount) / Math.pow(10, 18)} {requestData.currency}
-              </p>
+    <div className="min-h-screen bg-gradient-to-br from-[#1a1a2e] to-[#16213e] flex items-center justify-center p-6">
+      <div className="w-full max-w-md bg-[#222b54] rounded-3xl shadow-2xl overflow-hidden">
+        <div className="p-8 ">
+          <div className="text-center mb-6">
+            <h1 className="text-3xl font-bold text-[#CC0000] mb-2 flex justify-center items-center">
+              ReFi App
+            </h1>
+            <p className="text-gray-300 text-sm font-light">Send creator a superchat, it's a easy as typing a message and hitting send!</p>
+          </div>
+
+          {!address ? (
+            <div className="text-center text-gray-400 mb-6">Please connect your wallet to send a SuperChat</div>
+          ) : (
+            <div className="space-y-4">
+              <Input
+                name="message"
+                placeholder="Your SuperChat message.."
+                type="text"
+                maxLength={220}
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                className="bg-[#2d3e50] border-[#3f51b5] text-white placeholder-gray-400"
+              />
+
+              {requestData?.expectedAmount && requestData?.currency && (
+                <div className="flex justify-between text-gray-300 text-sm mb-4">
+                  <p className="font-semibold">
+                    {Number(requestData?.expectedAmount) / Math.pow(10, 18)} {requestData?.currency}
+                  </p>
+                </div>
+              )}
+
+              <Button
+                onClick={payTheRequest}
+                disabled={loading}
+                className={`w-full ${
+                  loading
+                    ? "bg-gray-600 text-gray-400 cursor-not-allowed"
+                    : "bg-gradient-to-r from-[#CC0000] to-[#880606] text-white hover:opacity-90"
+                } transition-all duration-300`}
+              >
+                {loading
+                  ? "Sending..."
+                  : `🎁 ${Number(requestData?.expectedAmount || '1000000000000000000') / Math.pow(10, 18)} ${requestData?.currency || 'FAU'}`}
+              </Button>
             </div>
           )}
-          <Button
-            id="send-superchat-button"
-            onClick={payTheRequest}
-            disabled={loading || !requestId}
-            className={`w-full bg-gradient-to-br from-[#CC0000] to-[#880606] text-white rounded p-2 transition-all duration-300 ${
-              loading ? "opacity-70 cursor-not-allowed" : ""
-            }`}
-          >
-            {loading ? "Sending..." : "Send Superchat"}
-          </Button>
         </div>
-      )}
 
-      {successMessage && (
-        <div className="bg-white text-gray-900 rounded-md p-2 mt-1 w-[90%]">
-          <h2 className="text-base font-semibold">Payment Successful!</h2>
-          <p className="text-sm">{successMessage}</p>
-          {/* <p className="text-xs mt-2">
-            Hurray! claim your token here:{" "}
-            <a href={generatedUrl} className="text-[#5DEB5A]">
-              {generatedUrl}
-            </a>
-          </p> */}
-        </div>
-      )}
+        {successMessage && (
+          <div className="p-4 bg-[#16213e] text-white rounded-b-3xl">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-semibold text-[#5DEB5A]">Payment Successful!</h2>
+                <p className="text-sm text-gray-300 mt-1">{successMessage}</p>
+              </div>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-8 w-8 text-[#CC0000]"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </div>
+          </div>
+        )}
+
+        <span className="text-xs text-gray-600 flex items-center justify-center mb-3">powered by Request Network</span>
+      </div>
     </div>
   );
 };

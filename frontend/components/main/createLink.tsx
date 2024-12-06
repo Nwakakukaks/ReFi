@@ -4,7 +4,7 @@ import { toast } from "@/components/ui/use-toast";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { CopyIcon } from "lucide-react";
+import { Clapperboard, CopyIcon, Wallet2 } from "lucide-react";
 import { useAccount, useWalletClient } from "wagmi";
 import { parseUnits, zeroAddress } from "viem";
 import { RequestNetwork, Types, Utils } from "@requestnetwork/request-client.js";
@@ -284,111 +284,119 @@ const CreatorLinkGenerator: React.FC = () => {
   };
 
   return (
-    <div className="flex justify-center items-center mt-10 h-[70vh]">
-      <div className="border-2 border-gray-500 flex flex-col justify-center items-center gap-2 rounded-sm px-4 py-12 shadow-lg w-[90%]">
-        {isDisconnected && <div className="text-red-500 mb-4">Please connect your wallet</div>}
-
-        <h1 className="text-2xl text-[#CC0000] font-semibold">Generate Your Unique Link</h1>
-        <p className="font-normal text-sm">Generate a unique URL and pin it in your live chat</p>
-
-        <div className="flex space-x-4 w-[90%]">
-          <Input
-            type="text"
-            placeholder="Enter your YouTube Live URL"
-            value={videoUrl}
-            onChange={(e) => setVideoUrl(e.target.value)}
-            className="mt-4 p-2 border rounded-sm text-gray-800"
-          />
-          <Input
-            type="text"
-            placeholder="Enter your wallet address"
-            value={Address}
-            onChange={(e) => setAddress(e.target.value)}
-            className="mt-4 p-2 border rounded-sm text-gray-800"
-          />
-        </div>
-
-        <div className="flex space-x-4 w-[90%]">
-          <Input
-            type="text"
-            placeholder="Set your superchat amount"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            className="mt-4 p-2 border rounded-sm text-gray-800"
-          />
-          <div className="flex space-x-2 ">
-            <select
-              name="currency"
-              onChange={(e) => setCurrency(e.target.value)}
-              defaultValue={currency}
-              className="mt-4 p-2 border rounded-sm text-gray-800"
-            >
-              {Array.from(currencies.entries()).map(([key, value]) => (
-                <option key={key} value={key}>
-                  {value.symbol} ({value.network})
-                </option>
-              ))}
-            </select>
-
-            <select
-              name="storage-chain"
-              onChange={(e) => setStorageChain(e.target.value)}
-              defaultValue={storageChain}
-              className="mt-4 p-2 border rounded-sm text-gray-800"
-            >
-              {Array.from(storageChains.entries()).map(([key, value]) => (
-                <option key={key} value={key}>
-                  {value.name} ({value.type})
-                </option>
-              ))}
-            </select>
+    <div className="min-h-screen flex items-center justify-center p-6">
+      <div className="w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden">
+        <div className="p-8 bg-gray-900">
+          <div className="text-center mb-6">
+            <h1 className="text-3xl font-bold text-[#CC0000] mb-3">Get Your Link</h1>
+            <p className="text-gray-300 text-sm">Generate a unique SuperChat URL for your stream</p>
           </div>
-        </div>
 
-        <Button
-          className="submit-button mt-4 bg-[#CC0000] text-white p-2 rounded hover:bg-[#CC0000] w-[90%]"
-          onClick={generateSuperchatUrl}
-          disabled={isDisconnected}
-        >
-          Generate Creator Link
-        </Button>
-        {generatedUrl && (
-          <div className="flex space-x-3 items-center justify-center mt-4 p-4 bg-white rounded-sm shadow text-gray-900 w-[90%]">
-            <p className="text-sm text-center">
-              Your generated URL:{" "}
-              <a href={generatedUrl} target="_blank" rel="noopener noreferrer" className="text-[#CC0000] underline">
-                {generatedUrl}
-              </a>
-            </p>
+          {isDisconnected && (
+            <div className="bg-red-500/20 text-red-300 text-center p-3 rounded-lg mb-4">
+              Please connect your wallet to proceed!
+            </div>
+          )}
 
-            <button onClick={copyLink}>
-              <CopyIcon className="w-4 h-4" />
-            </button>
-          </div>
-        )}
+          <div className="space-y-4">
+            <div className="grid md:grid-cols-2 gap-4">
+              <Input
+                type="text"
+                placeholder="YouTube Live URL"
+                value={videoUrl}
+                onChange={(e) => setVideoUrl(e.target.value)}
+                className="bg-[#2d3e50] border-[#3f51b5] text-white placeholder-gray-400"
+              />
+              <Input
+                type="text"
+                placeholder="Wallet Address"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                className="bg-[#2d3e50] border-[#3f51b5] text-white placeholder-gray-400"
+              />
+            </div>
 
-        <div className="grid grid-cols-2 gap-5 mt-8 w-[90%]">
-          <Card
-            onClick={handleStreams}
-            className="bg-transparent text-gray-400 border-gray-600 border-2 rounded-sm mt-2 w-full cursor-pointer "
-          >
-            <CardContent className="flex items-center justify-center space-x-3 mt-3">
-              <div className="flex items-center">
-                <img src="/icons/wallet.svg" className="h-14 w-14 p-2 rounded-sm mx-auto" alt="Wallet icon" />
+            <div className="grid md:grid-cols-2 gap-4">
+              <Input
+                type="number"
+                placeholder="SuperChat Amount"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                className="bg-[#2d3e50] border-[#3f51b5] text-white placeholder-gray-400"
+              />
+              <div className="grid grid-cols-2 gap-2">
+                <select
+                  value={currency}
+                  onChange={(e) => setCurrency(e.target.value)}
+                  className="bg-[#2d3e50] text-white rounded-md p-2"
+                >
+                  {Array.from(currencies.entries()).map(([key, value]) => (
+                    <option key={key} value={key}>
+                      {value.symbol} ({value.network})
+                    </option>
+                  ))}
+                </select>
+                <select
+                  value={storageChain}
+                  onChange={(e) => setStorageChain(e.target.value)}
+                  className="bg-[#2d3e50] text-white rounded-md p-2"
+                >
+                  {Array.from(storageChains.entries()).map(([key, value]) => (
+                    <option key={key} value={key}>
+                      {value.name}
+                    </option>
+                  ))}
+                </select>
               </div>
-              <p className="text-gray-100 text-lg font-medium"> Past streams</p>
+            </div>
+
+            <Button 
+              onClick={generateSuperchatUrl}
+              disabled={isDisconnected}
+              className={`w-full ${
+                isDisconnected 
+                  ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                  : 'bg-[#CC0000] hover:bg-[#d33f3f] text-white'
+              } transition-colors`}
+            >
+              Generate Creator Link
+            </Button>
+
+            {generatedUrl && (
+              <div className="flex items-center bg-[#16213e] p-3 rounded-lg mt-4">
+                <a 
+                  href={generatedUrl} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="text-[#CC0000] mr-2 truncate flex-grow"
+                >
+                  {generatedUrl}
+                </a>
+                <button onClick={copyLink} className="ml-2">
+                  <CopyIcon className="text-white w-5 h-5" />
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4 p-6 bg-[#16213e]">
+          <Card 
+            onClick={handleStreams}
+            className="bg-gray-700 border-none hover:bg-[#222b54] transition-colors cursor-pointer"
+          >
+            <CardContent className="flex items-center justify-center space-x-2 p-4">
+              <Clapperboard className="text-[#CC0000] w-6 h-6" />
+              <span className="text-white">Past Streams</span>
             </CardContent>
           </Card>
-
-          <Card
+          <Card 
             onClick={handleTransactions}
-            className="bg-transparent text-gray-400 border-gray-600 border-2 rounded-sm mt-2 w-full cursor-pointer"
+            className="bg-gray-700 border-none hover:bg-[#222b54] transition-colors cursor-pointer"
           >
-            <CardContent className="flex space-x-3 items-center justify-center mt-3">
-              <div className="flex items-center">
-                <img src="/icons/member.svg" className="h-14 w-14 p-2 rounded-sm mx-auto" alt="Member icon" />
-              </div>
-              <p className="text-gray-100 text-lg font-medium"> Transactions</p>
+            <CardContent className="flex items-center justify-center space-x-2 p-4">
+              <Wallet2 className="text-[#CC0000] w-6 h-6" />
+              <span className="text-white">Transactions</span>
             </CardContent>
           </Card>
         </div>
