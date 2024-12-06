@@ -305,14 +305,14 @@ const CreatorLinkGenerator: React.FC = () => {
                 placeholder="YouTube Live URL"
                 value={videoUrl}
                 onChange={(e) => setVideoUrl(e.target.value)}
-                className="bg-[#2d3e50] border-[#3f51b5] text-white placeholder-gray-400"
+                className="bg-[#2d3e50] border-none text-white placeholder-gray-400"
               />
               <Input
                 type="text"
                 placeholder="Wallet Address"
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
-                className="bg-[#2d3e50] border-[#3f51b5] text-white placeholder-gray-400"
+                className="bg-[#2d3e50] border-none text-white placeholder-gray-400"
               />
             </div>
 
@@ -322,7 +322,7 @@ const CreatorLinkGenerator: React.FC = () => {
                 placeholder="SuperChat Amount"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
-                className="bg-[#2d3e50] border-[#3f51b5] text-white placeholder-gray-400"
+                className="bg-[#2d3e50] border-none text-white placeholder-gray-400"
               />
               <div className="grid grid-cols-2 gap-2">
                 <select
@@ -380,10 +380,10 @@ const CreatorLinkGenerator: React.FC = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 p-6 bg-[#16213e]">
+        <div className="grid grid-cols-2 gap-4 p-6 bg-[#aaadb9]">
           <Card 
             onClick={handleStreams}
-            className="bg-gray-700 border-none hover:bg-[#222b54] transition-colors cursor-pointer"
+            className="bg-gray-700 border-none hover:bg-gray-900 transition-colors cursor-pointer"
           >
             <CardContent className="flex items-center justify-center space-x-2 p-4">
               <Clapperboard className="text-[#CC0000] w-6 h-6" />
@@ -392,7 +392,7 @@ const CreatorLinkGenerator: React.FC = () => {
           </Card>
           <Card 
             onClick={handleTransactions}
-            className="bg-gray-700 border-none hover:bg-[#222b54] transition-colors cursor-pointer"
+            className="bg-gray-700 border-none hover:bg-gray-900 transition-colors cursor-pointer"
           >
             <CardContent className="flex items-center justify-center space-x-2 p-4">
               <Wallet2 className="text-[#CC0000] w-6 h-6" />
