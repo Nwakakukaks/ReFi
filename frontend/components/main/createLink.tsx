@@ -13,9 +13,10 @@ import { currencies } from "@/hooks/currency";
 import { storageChains } from "@/hooks/storage-chain";
 
 const CreatorLinkGenerator: React.FC = () => {
+  const { address, isDisconnected } = useAccount();
   const navigate = useNavigate();
   const [videoUrl, setVideoUrl] = useState("");
-  const [Address, setAddress] = useState("");
+  const [Address, setAddress] = useState('');
   const [generatedUrl, setGeneratedUrl] = useState("");
   const [amount, setAmount] = useState("");
   const [storageChain, setStorageChain] = useState(() => {
@@ -29,7 +30,7 @@ const CreatorLinkGenerator: React.FC = () => {
   });
 
   // Wallet connection
-  const { address, isDisconnected } = useAccount();
+
   const { data: walletClient } = useWalletClient();
 
   // Validation checks
@@ -310,7 +311,7 @@ const CreatorLinkGenerator: React.FC = () => {
               <Input
                 type="text"
                 placeholder="Wallet Address"
-                value={address}
+                value={Address}
                 onChange={(e) => setAddress(e.target.value)}
                 className="bg-[#2d3e50] border-none text-white placeholder-gray-400"
               />
