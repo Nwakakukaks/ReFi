@@ -78,26 +78,26 @@ const CreatorLinkGenerator: React.FC = () => {
 
     // Validate video URL
     if (!videoUrl) {
-      errors.push("YouTube Live URL is required");
+      console.log("YouTube Live URL is required");
     } else {
       const videoId = extractVideoId(videoUrl);
       if (!videoId) {
-        errors.push("Invalid YouTube URL. Please provide a valid live stream or video URL.");
+        console.log("Invalid YouTube URL. Please provide a valid live stream or video URL.");
       }
     }
 
     // Validate address
     if (!Address || !isValidEthereumAddress(Address)) {
-      errors.push("Invalid Ethereum address");
+      console.log("Invalid Ethereum address");
     }
 
     // Validate currency and storage chain
     if (!currency || !currencies.has(currency)) {
-      errors.push("Invalid currency selected");
+      console.log("Invalid currency selected");
     }
 
     if (!storageChain || !storageChains.has(storageChain)) {
-      errors.push("Invalid storage chain selected");
+      console.log("Invalid storage chain selected");
     }
 
     setValidationErrors(errors);
