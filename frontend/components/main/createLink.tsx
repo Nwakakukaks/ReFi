@@ -289,7 +289,7 @@ const CreatorLinkGenerator: React.FC = () => {
         <div className="p-8 bg-gray-900">
           <div className="text-center mb-6">
             <h1 className="text-3xl font-bold text-[#CC0000] mb-3">Get Your Link</h1>
-            <p className="text-gray-300 text-sm">Generate a unique SuperChat URL for your stream</p>
+            <p className="text-gray-300 text-sm">Generate a SuperChat link for your stream</p>
           </div>
 
           {isDisconnected && (
@@ -383,7 +383,7 @@ const CreatorLinkGenerator: React.FC = () => {
         <div className="grid grid-cols-2 gap-4 p-6 bg-[#e0e1e6]">
           <Card 
             onClick={handleStreams}
-            className="bg-gray-700 border-none hover:bg-gray-900 transition-colors cursor-pointer"
+            className="bg-gray-900 border-none hover:bg-gray-800 transition-colors cursor-pointer"
           >
             <CardContent className="flex items-center justify-center space-x-2 p-4">
               <Clapperboard className="text-[#CC0000] w-6 h-6" />
@@ -392,7 +392,7 @@ const CreatorLinkGenerator: React.FC = () => {
           </Card>
           <Card 
             onClick={handleTransactions}
-            className="bg-gray-700 border-none hover:bg-gray-900 transition-colors cursor-pointer"
+            className="bg-gray-900 border-none hover:bg-gray-800 transition-colors cursor-pointer"
           >
             <CardContent className="flex items-center justify-center space-x-2 p-4">
               <Wallet2 className="text-[#CC0000] w-6 h-6" />
