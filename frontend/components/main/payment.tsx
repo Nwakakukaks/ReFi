@@ -229,12 +229,12 @@ const Payment: React.FC = () => {
   }, [requestId]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#1a1a2e] to-[#16213e] flex items-center justify-center p-6">
-      <div className="w-full max-w-md bg-[#222b54] rounded-3xl shadow-2xl overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center p-6">
+      <div className="w-full max-w-md bg-gray-900 rounded-3xl shadow-2xl overflow-hidden">
         <div className="p-8 ">
           <div className="text-center mb-6">
-            <h1 className="text-3xl font-bold text-[#CC0000] mb-2 flex justify-center items-center">
-              ReFi App
+            <h1 className="text-2xl font-bold text-[#CC0000] mb-2 flex justify-center items-center">
+              ReFi (Request Finance)
             </h1>
             <p className="text-gray-300 text-sm font-light">Send creator a superchat, it's a easy as typing a message and hitting send!</p>
           </div>
@@ -250,7 +250,7 @@ const Payment: React.FC = () => {
                 maxLength={220}
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                className="bg-[#2d3e50] border-[#3f51b5] text-white placeholder-gray-400"
+                className="bg-[#2d3e50] border-none text-white placeholder-gray-400"
               />
 
               {requestData?.expectedAmount && requestData?.currency && (
@@ -301,7 +301,7 @@ const Payment: React.FC = () => {
           </div>
         )}
 
-        <span className="text-xs text-gray-600 flex items-center justify-center mb-3">powered by Request Network</span>
+        <span className="text-xs text-gray-600 flex items-center justify-center mb-3 font-medium">powered by Request Network</span>
       </div>
     </div>
   );

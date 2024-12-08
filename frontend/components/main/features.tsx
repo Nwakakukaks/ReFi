@@ -75,10 +75,9 @@ export const Features = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-white mb-3 text-lg font-medium">Exclusive Memberships</p>
+              <p className="text-white mb-3 text-lg font-medium">No Minimium Requirements</p>
               <p className="text-gray-400 text-sm">
-                Create tokens to reward your supporters, granting them access to exclusive content across platforms like
-                Patreon and Substack.
+                No minimium channel subscribers count required to setup. Available for both small and large creators!
               </p>
             </CardContent>
           </Card>

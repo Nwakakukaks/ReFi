@@ -380,7 +380,7 @@ const CreatorLinkGenerator: React.FC = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 p-6 bg-[#aaadb9]">
+        <div className="grid grid-cols-2 gap-4 p-6 bg-[#e0e1e6]">
           <Card 
             onClick={handleStreams}
             className="bg-gray-700 border-none hover:bg-gray-900 transition-colors cursor-pointer"

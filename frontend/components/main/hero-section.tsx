@@ -48,16 +48,16 @@ export const HeroSection: React.FC = () => {
   return (
     <div className="flex flex-col gap-6 items-center mt-12">
       <div>
-        <p className="md:text-5xl text-3xl text-center max-w-4xl font-semibold">Receive YouTube superchats in</p>
-        <div className="flex space-x-3 items-center justify-center mt-2">
-         <EVMChainCarousel/>
+        <p className="md:text-5xl text-3xl text-center max-w-4xl font-semibold">Receive YouTube superchats</p>
+        <div className="flex space-x-3 items-center justify-center mt-2 md:text-5xl text-3xl text-center max-w-4xl font-semibold ">
+          {/* <EVMChainCarousel /> */}
+          Instantly with <span className="text-red-500 ml-4 font-bold">Zero Fees</span>
         </div>
       </div>
 
-     
       <p className="text-gray-400 text-sm font-medium max-w-2xl mx-auto text-center">
-        Create shareable links to receive SUPERCHATS in any EVM token (powered by Request) from your viewers during live streams. Coming soon
-        on Twitch, TikTok, and Instagram!
+        Create shareable links to receive SUPERCHATS from your viewers during live streams in any Request Network
+        supported chain. Coming soon on Twitch and TikTok!
       </p>
 
       <div className="flex items-center space-x-3">
@@ -82,46 +82,41 @@ export const HeroSection: React.FC = () => {
   );
 };
 
+// const EVMChains = [
+//   { name: "Avalanche", logo: "/icons/avalanche.svg", color: "#E84142" },
+//   { name: "Base", logo: "/icons/base.svg", color: "#0052FF" },
+//   { name: "Ethereum", logo: "/icons/ethereum.svg", color: "#627EEA" },
+//   { name: "Polygon", logo: "/icons/polygon.svg", color: "#8247E5" },
+//   { name: "Arbitrum", logo: "/icons/arbitrum.svg", color: "#2B323C" },
+//   { name: "Optimism", logo: "/icons/optimism.svg", color: "#FF0420" },
+// ];
 
+// const EVMChainCarousel: React.FC = () => {
+//   const [currentChainIndex, setCurrentChainIndex] = useState(0);
 
+//   useEffect(() => {
+//     const interval = setInterval(() => {
+//       setCurrentChainIndex((prev) => (prev + 1) % EVMChains.length);
+//     }, 2000);
 
+//     return () => clearInterval(interval);
+//   }, []);
 
+//   const currentChain = EVMChains[currentChainIndex];
 
-const EVMChains = [
-  { name: "Avalanche", logo: "/icons/avalanche.svg", color: "#E84142" },
-  { name: "Base", logo: "/icons/base.svg", color: "#0052FF" },
-  { name: "Ethereum", logo: "/icons/ethereum.svg", color: "#627EEA" },
-  { name: "Polygon", logo: "/icons/polygon.svg", color: "#8247E5" },
-  { name: "Arbitrum", logo: "/icons/arbitrum.svg", color: "#2B323C" },
-  { name: "Optimism", logo: "/icons/optimism.svg", color: "#FF0420" }
-];
-
- const EVMChainCarousel: React.FC = () => {
-  const [currentChainIndex, setCurrentChainIndex] = useState(0);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentChainIndex((prev) => (prev + 1) % EVMChains.length);
-    }, 2000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  const currentChain = EVMChains[currentChainIndex];
-
-  return (
-    <div className="flex items-center space-x-3 transition-all duration-500 ease-in-out">
-      <img 
-        src={currentChain.logo} 
-        alt={`${currentChain.name} logo`} 
-        className="w-12 h-12 transition-all duration-500"
-      />
-      <span 
-        className="md:text-5xl text-3xl font-bold transition-all duration-500" 
-        style={{ color: currentChain.color }}
-      >
-        {currentChain.name}
-      </span>
-    </div>
-  );
-};
+//   return (
+//     <div className="flex items-center space-x-3 transition-all duration-500 ease-in-out">
+//       <img
+//         src={currentChain.logo}
+//         alt={`${currentChain.name} logo`}
+//         className="w-12 h-12 transition-all duration-500"
+//       />
+//       <span
+//         className="md:text-5xl text-3xl font-bold transition-all duration-500"
+//         style={{ color: currentChain.color }}
+//       >
+//         {currentChain.name}
+//       </span>
+//     </div>
+//   );
+// };
