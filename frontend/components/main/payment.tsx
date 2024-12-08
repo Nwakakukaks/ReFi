@@ -282,7 +282,7 @@ const Payment: React.FC = () => {
           <div className="p-4 bg-[#16213e] text-white rounded-b-3xl">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-lg font-semibold text-[#5DEB5A]">Payment Successful!</h2>
+                <h2 className="text-base font-semibold text-white">Payment Successful!</h2>
                 <p className="text-sm text-gray-300 mt-1">{successMessage}</p>
               </div>
               <svg
